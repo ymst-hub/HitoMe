@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -35,17 +36,19 @@ class DBHelper {
   static const _appearanceColumnId = 'id';
   static const _appearanceColumnThings = 'things';
 
-
   //このクラスのインスタンスを作成する
   DBHelper._privateConstructor();
+
   static final DBHelper _instance = DBHelper._privateConstructor();
+
   factory DBHelper() {
     return _instance;
   }
-  DBHelper._internal();
 
+  DBHelper._internal();
   //DBを開く
   static Database? _database;
+
   Future<Database> get database async {
     if (_database != null) {
       return _database!;
@@ -70,20 +73,20 @@ class DBHelper {
   }
 
   //DBを閉じる
-  Future<void> close() async{
+  Future<void> close() async {
     final db = await database;
     db.close();
   }
 
   //DBを削除する　※念の為
-  Future<void> deleteDB() async{
+  Future<void> deleteDB() async {
     var databasesPath = await getDatabasesPath();
     var path = join(databasesPath, _databaseName);
     await deleteDatabase(path);
   }
 
   //DBのテーブルを作成する
-  _onCreate(Database db, int version){
+  _onCreate(Database db, int version) {
     db.execute('''
       CREATE TABLE $_personTableName (
         $_personColumnId INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -123,7 +126,7 @@ class DBHelper {
   //DBにデータを挿入する
   /// personテーブルの操作
   //personテーブルにデータを挿入する
-  Future<void> insertPerson(String name) async{
+  Future<void> insertPerson(String name) async {
     final db = await database;
     await db.insert(
       _personTableName,
@@ -133,8 +136,9 @@ class DBHelper {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
+
   //personテーブルのデータを更新する
-  Future<void> updatePerson(int id, String name) async{
+  Future<void> updatePerson(int id, String name) async {
     final db = await database;
     await db.update(
       _personTableName,
@@ -145,8 +149,9 @@ class DBHelper {
       whereArgs: [id],
     );
   }
+
   //personテーブルのデータを削除する
-  Future<void> deletePersonById(int id) async{
+  Future<void> deletePersonById(int id) async {
     final db = await database;
     await db.delete(
       _personTableName,
@@ -156,14 +161,14 @@ class DBHelper {
   }
 
   //personテーブルのデータを全件取得する
-  Future<List<Map<String, dynamic>>> getAllPerson() async{
+  Future<List<Map<String, dynamic>>> getAllPerson() async {
     final db = await database;
     return db.query(_personTableName);
   }
 
   /// willテーブルの操作
   //willテーブルにデータを挿入する
-  Future<void> insertWill(int id, String things) async{
+  Future<void> insertWill(int id, String things) async {
     final db = await database;
     await db.insert(
       _willTableName,
@@ -174,8 +179,9 @@ class DBHelper {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
+
   //willテーブルのデータを更新する
-  Future<void> updateWill(int serial, int id, String things) async{
+  Future<void> updateWill(int serial, int id, String things) async {
     final db = await database;
     await db.update(
       _willTableName,
@@ -187,8 +193,9 @@ class DBHelper {
       whereArgs: [serial],
     );
   }
+
   //willテーブルのデータを削除する
-  Future<void> deleteWillBySerial(int serial) async{
+  Future<void> deleteWillBySerial(int serial) async {
     final db = await database;
     await db.delete(
       _willTableName,
@@ -196,8 +203,9 @@ class DBHelper {
       whereArgs: [serial],
     );
   }
+
   //willテーブルのデータを削除する
-  Future<void> deleteWillById(int id) async{
+  Future<void> deleteWillById(int id) async {
     final db = await database;
     await db.delete(
       _willTableName,
@@ -205,8 +213,9 @@ class DBHelper {
       whereArgs: [id],
     );
   }
+
   //willテーブルの同一人物のデータを全件取得する
-  Future<List<Map<String, dynamic>>> getWillById(int id) async{
+  Future<List<Map<String, dynamic>>> getWillById(int id) async {
     final db = await database;
     return db.query(
       _willTableName,
@@ -214,8 +223,9 @@ class DBHelper {
       whereArgs: [id],
     );
   }
+
   //willテーブルのデータSerial（連番から）を単一取得する
-  Future<List<Map<String, dynamic>>> getWillBySerial(int serial) async{
+  Future<List<Map<String, dynamic>>> getWillBySerial(int serial) async {
     final db = await database;
     return db.query(
       _willTableName,
@@ -226,7 +236,7 @@ class DBHelper {
 
   /// doneテーブルの操作
   //doneテーブルにデータを挿入する
-  Future<void> insertDone(int id, String things) async{
+  Future<void> insertDone(int id, String things) async {
     final db = await database;
     await db.insert(
       _doneTableName,
@@ -237,8 +247,9 @@ class DBHelper {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
+
   //doneテーブルのデータを更新する
-  Future<void> updateDone(int serial, int id, String things) async{
+  Future<void> updateDone(int serial, int id, String things) async {
     final db = await database;
     await db.update(
       _doneTableName,
@@ -250,8 +261,9 @@ class DBHelper {
       whereArgs: [serial],
     );
   }
+
   //doneテーブルの単一のデータを削除する
-  Future<void> deleteDoneBySerial(int serial) async{
+  Future<void> deleteDoneBySerial(int serial) async {
     final db = await database;
     await db.delete(
       _doneTableName,
@@ -259,8 +271,9 @@ class DBHelper {
       whereArgs: [serial],
     );
   }
+
   //doneテーブルの同一人物のデータを削除する
-  Future<void> deleteDoneById(int id) async{
+  Future<void> deleteDoneById(int id) async {
     final db = await database;
     await db.delete(
       _doneTableName,
@@ -268,8 +281,9 @@ class DBHelper {
       whereArgs: [id],
     );
   }
+
   //doneテーブルの同一人物のデータを全件取得する
-  Future<List<Map<String, dynamic>>> getDoneById(int id) async{
+  Future<List<Map<String, dynamic>>> getDoneById(int id) async {
     final db = await database;
     return db.query(
       _doneTableName,
@@ -277,8 +291,9 @@ class DBHelper {
       whereArgs: [id],
     );
   }
+
   //doneテーブルのデータSerial（連番から）を単一取得する
-  Future<List<Map<String, dynamic>>> getDoneBySerial(int serial) async{
+  Future<List<Map<String, dynamic>>> getDoneBySerial(int serial) async {
     final db = await database;
     return db.query(
       _doneTableName,
@@ -289,7 +304,7 @@ class DBHelper {
 
   /// personalityテーブルの操作
   //personalityテーブルにデータを挿入する
-  Future<void> insertPersonality(int id, String things) async{
+  Future<void> insertPersonality(int id, String things) async {
     final db = await database;
     await db.insert(
       _personalityTableName,
@@ -300,8 +315,9 @@ class DBHelper {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
+
   //personalityテーブルのデータを更新する
-  Future<void> updatePersonality(int serial, int id, String things) async{
+  Future<void> updatePersonality(int serial, int id, String things) async {
     final db = await database;
     await db.update(
       _personalityTableName,
@@ -313,8 +329,9 @@ class DBHelper {
       whereArgs: [serial],
     );
   }
+
   //personalityテーブルのデータを削除する
-  Future<void> deletePersonalityBySerial(int serial) async{
+  Future<void> deletePersonalityBySerial(int serial) async {
     final db = await database;
     await db.delete(
       _personalityTableName,
@@ -322,8 +339,9 @@ class DBHelper {
       whereArgs: [serial],
     );
   }
+
   //personalityテーブルのデータを削除する
-  Future<void> deletePersonalityById(int id) async{
+  Future<void> deletePersonalityById(int id) async {
     final db = await database;
     await db.delete(
       _personalityTableName,
@@ -331,8 +349,9 @@ class DBHelper {
       whereArgs: [id],
     );
   }
+
   //personalityテーブルの同一人物のデータを全件取得する
-  Future<List<Map<String, dynamic>>> getPersonalityById(int id) async{
+  Future<List<Map<String, dynamic>>> getPersonalityById(int id) async {
     final db = await database;
     return db.query(
       _personalityTableName,
@@ -340,8 +359,9 @@ class DBHelper {
       whereArgs: [id],
     );
   }
+
   //personalityテーブルのデータSerial（連番から）を単一取得する
-  Future<List<Map<String, dynamic>>> getPersonalityBySerial(int serial) async{
+  Future<List<Map<String, dynamic>>> getPersonalityBySerial(int serial) async {
     final db = await database;
     return db.query(
       _personalityTableName,
@@ -352,7 +372,7 @@ class DBHelper {
 
   /// appearanceテーブルの操作
   //appearanceテーブルにデータを挿入する
-  Future<void> insertAppearance(int id, String things) async{
+  Future<void> insertAppearance(int id, String things) async {
     final db = await database;
     await db.insert(
       _appearanceTableName,
@@ -363,8 +383,9 @@ class DBHelper {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
+
   //appearanceテーブルのデータを更新する
-  Future<void> updateAppearance(int serial, int id, String things) async{
+  Future<void> updateAppearance(int serial, int id, String things) async {
     final db = await database;
     await db.update(
       _appearanceTableName,
@@ -376,8 +397,9 @@ class DBHelper {
       whereArgs: [serial],
     );
   }
+
   //appearanceテーブルのデータを削除する
-  Future<void> deleteAppearanceBySerial(int serial) async{
+  Future<void> deleteAppearanceBySerial(int serial) async {
     final db = await database;
     await db.delete(
       _appearanceTableName,
@@ -385,8 +407,9 @@ class DBHelper {
       whereArgs: [serial],
     );
   }
+
   //appearanceテーブルのデータを削除する
-  Future<void> deleteAppearanceById(int id) async{
+  Future<void> deleteAppearanceById(int id) async {
     final db = await database;
     await db.delete(
       _appearanceTableName,
@@ -394,8 +417,9 @@ class DBHelper {
       whereArgs: [id],
     );
   }
+
   //appearanceテーブルの同一人物のデータを全件取得する
-  Future<List<Map<String, dynamic>>> getAppearanceById(int id) async{
+  Future<List<Map<String, dynamic>>> getAppearanceById(int id) async {
     final db = await database;
     return db.query(
       _appearanceTableName,
@@ -403,8 +427,9 @@ class DBHelper {
       whereArgs: [id],
     );
   }
+
   //appearanceテーブルのデータSerial（連番から）を単一取得する
-  Future<List<Map<String, dynamic>>> getAppearanceBySerial(int serial) async{
+  Future<List<Map<String, dynamic>>> getAppearanceBySerial(int serial) async {
     final db = await database;
     return db.query(
       _appearanceTableName,

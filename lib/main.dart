@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'DBHelper.dart';
 import 'personal_detail.dart';
 
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
+
   final String title;
 
   @override
@@ -39,7 +41,6 @@ class _MyHomePageState extends State<MyHomePage> {
   var ids = <String>[];
   var names = <String>[];
 
-  
   @override
   void initState() {
     _createList();
@@ -83,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
-  
+
   //リストを作成する
   Future _createList() async {
     people = await _getPeople();
@@ -93,6 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ids = people.map((person) => person['id'].toString()).toList();
     });
   }
+
   //personテーブルから全てのデータを取得する
   Future<List<Map<String, dynamic>>> _getPeople() async {
     return await DBHelper().getAllPerson();
@@ -119,30 +121,32 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<Widget> listViewPerson() {
     return <Widget>[
-        Expanded(
-          child: ListView.builder(
-            itemCount: names.length,
-            itemBuilder: (context, index) {
-              return Column(
-                children: [
-                  ListTile(
-                    title: Text(names[index]),
-                    onTap: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => PersonalDetail(person: people[index])),
-                      );
-                      setState(() {
-                        _createList();
-                      });
-                    },
-                  ),
-                  const Divider(),
-                ],
-              );
-            },
-          ),
+      Expanded(
+        child: ListView.builder(
+          itemCount: names.length,
+          itemBuilder: (context, index) {
+            return Column(
+              children: [
+                ListTile(
+                  title: Text(names[index]),
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              PersonalDetail(person: people[index])),
+                    );
+                    setState(() {
+                      _createList();
+                    });
+                  },
+                ),
+                const Divider(),
+              ],
+            );
+          },
         ),
-      ];
+      ),
+    ];
   }
 }

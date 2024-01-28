@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'DBHelper.dart';
 import 'ai_prompt.dart';
 
@@ -10,10 +11,10 @@ class PersonalDetail extends StatefulWidget {
   final Map<String, dynamic> person;
 
   @override
-  _PersonalDetailState createState() => _PersonalDetailState();
+  PersonalDetailState createState() => PersonalDetailState();
 }
 
-class _PersonalDetailState extends State<PersonalDetail> {
+class PersonalDetailState extends State<PersonalDetail> {
   final _textController = TextEditingController();
   var selector = TabItem.will;
   var person = <Map<String, dynamic>>[];
@@ -28,24 +29,37 @@ class _PersonalDetailState extends State<PersonalDetail> {
     final will = await DBHelper().getWillById(widget.person['id']);
     final done = await DBHelper().getDoneById(widget.person['id']);
     final appearance = await DBHelper().getAppearanceById(widget.person['id']);
-    final personality = await DBHelper().getPersonalityById(widget.person['id']);
+    final personality =
+        await DBHelper().getPersonalityById(widget.person['id']);
 
     //それぞれをリスト形式に変更する
     var willList = will.map((will) => will['things'].toString()).toList();
     var doneList = done.map((done) => done['things'].toString()).toList();
-    var appearanceList = appearance.map((appearance) => appearance['things'].toString()).toList();
-    var personalityList = personality.map((personality) => personality['things'].toString()).toList();
+    var appearanceList = appearance
+        .map((appearance) => appearance['things'].toString())
+        .toList();
+    var personalityList = personality
+        .map((personality) => personality['things'].toString())
+        .toList();
 
     var willSerialList = will.map((will) => will['Serial'].toString()).toList();
     var doneSerialList = done.map((done) => done['Serial'].toString()).toList();
-    var appearanceSerialList = appearance.map((appearance) => appearance['Serial'].toString()).toList();
-    var personalitySerialList = personality.map((personality) => personality['Serial'].toString()).toList();
+    var appearanceSerialList = appearance
+        .map((appearance) => appearance['Serial'].toString())
+        .toList();
+    var personalitySerialList = personality
+        .map((personality) => personality['Serial'].toString())
+        .toList();
 
-    
     setState(() {
       //ListをそれぞれpersonDetailに格納する
       personsDetail = [willList, appearanceList, personalityList, doneList];
-      personSerial = [willSerialList, appearanceSerialList, personalitySerialList, doneSerialList];
+      personSerial = [
+        willSerialList,
+        appearanceSerialList,
+        personalitySerialList,
+        doneSerialList
+      ];
     });
   }
 
@@ -123,7 +137,9 @@ class _PersonalDetailState extends State<PersonalDetail> {
     await DBHelper().deletePersonalityById(widget.person['id']);
     await DBHelper().deletePersonById(widget.person['id']);
     //前の画面に戻る
-    Navigator.pop(context);
+    if(mounted){
+      Navigator.pop(context);
+    }
   }
 
   Future<void> _deleteThings(var index) async {
@@ -142,7 +158,7 @@ class _PersonalDetailState extends State<PersonalDetail> {
             TextButton(
               child: const Text('キャンセル'),
               onPressed: () {
-                Navigator.of(context).pop();  // ダイアログを閉じる
+                Navigator.of(context).pop(); // ダイアログを閉じる
               },
             ),
             TextButton(
@@ -151,26 +167,31 @@ class _PersonalDetailState extends State<PersonalDetail> {
                 //selectorに応じてDBからデータを削除する
                 switch (selector) {
                   case TabItem.will:
-                    DBHelper().deleteWillBySerial(int.parse(personSerial[selector.index][index]));
+                    DBHelper().deleteWillBySerial(
+                        int.parse(personSerial[selector.index][index]));
                     break;
                   case TabItem.appearance:
-                    DBHelper().deleteAppearanceBySerial(int.parse(personSerial[selector.index][index]));
+                    DBHelper().deleteAppearanceBySerial(
+                        int.parse(personSerial[selector.index][index]));
                     break;
                   case TabItem.personality:
-                    DBHelper().deletePersonalityBySerial(int.parse(personSerial[selector.index][index]));
+                    DBHelper().deletePersonalityBySerial(
+                        int.parse(personSerial[selector.index][index]));
                     break;
                   case TabItem.done:
-                    DBHelper().deleteDoneBySerial(int.parse(personSerial[selector.index][index]));
+                    DBHelper().deleteDoneBySerial(
+                        int.parse(personSerial[selector.index][index]));
                     break;
                   default:
-                  //デフォルトをwillに設定しておく
-                    DBHelper().deleteWillBySerial(int.parse(personSerial[selector.index][index]));
+                    //デフォルトをwillに設定しておく
+                    DBHelper().deleteWillBySerial(
+                        int.parse(personSerial[selector.index][index]));
                     break;
                 }
                 //リストを再作成する
                 _createList();
 
-                Navigator.of(context).pop();  // ダイアログを閉じる
+                Navigator.of(context).pop(); // ダイアログを閉じる
               },
             ),
           ],
@@ -180,20 +201,21 @@ class _PersonalDetailState extends State<PersonalDetail> {
   }
 
   //promptを生成する
-  void _makePrompt(){
+  void _makePrompt() {
     //初期化
     promptDisplay = "";
     //selectorに応じてpromptを作成する
     promptDisplay = promptHead;
-    for(var i = 0; i < personsDetail[selector.index].length; i++){
+    for (var i = 0; i < personsDetail[selector.index].length; i++) {
       promptDisplay += "・${personsDetail[selector.index][i]}\n";
     }
     //prompt表示ページに移動する
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AiPrompt(person: widget.person, promptDisplay: promptDisplay)),
+      MaterialPageRoute(
+          builder: (context) =>
+              AiPrompt(person: widget.person, promptDisplay: promptDisplay)),
     );
-
   }
 
   @override
@@ -215,20 +237,21 @@ class _PersonalDetailState extends State<PersonalDetail> {
             child: FutureBuilder(
               future: _createList(),
               builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                  return ListView.builder(
-                    itemCount: personsDetail[selector.index].length ?? 1,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Column(
-                        children: [
-                          ListTile(
-                            title: Text(personsDetail[selector.index][index].toString() ?? "未入力"),
-                            onTap: () => _deleteThings(index),
-                          ),
-                          Divider(),
-                        ],
-                      );
-                    },
-                  );
+                return ListView.builder(
+                  itemCount: personsDetail[selector.index].length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Column(
+                      children: [
+                        ListTile(
+                          title: Text(
+                        (personsDetail[selector.index][index].toString())),
+                          onTap: () => _deleteThings(index),
+                        ),
+                        const Divider(),
+                      ],
+                    );
+                  },
+                );
               },
             ),
           )
