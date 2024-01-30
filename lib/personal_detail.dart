@@ -15,7 +15,8 @@ class PersonalDetail extends StatefulWidget {
 }
 
 class PersonalDetailState extends State<PersonalDetail> {
-  final _textController = TextEditingController();
+  late TextEditingController _textController;
+  late FocusNode _focusNode;
   var selector = TabItem.will;
   var person = <Map<String, dynamic>>[];
   var personsDetail = <List<String>>[];
@@ -63,18 +64,16 @@ class PersonalDetailState extends State<PersonalDetail> {
     });
   }
 
-  Future<void> _add() async {
-    //アラートダイアログを表示する
-    addAlert();
-  }
-
-  Future<dynamic> addAlert() {
-    return showDialog(
+  void _addAlert() {
+    _textController = TextEditingController();
+    _focusNode = FocusNode();
+    showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           content: TextField(
             controller: _textController,
+            focusNode: _focusNode,
             decoration: const InputDecoration(hintText: "内容"),
           ),
           actions: <Widget>[
@@ -126,7 +125,14 @@ class PersonalDetailState extends State<PersonalDetail> {
           ],
         );
       },
-    );
+    ).then((_) {
+      _textController.dispose();
+      _focusNode.dispose();
+    });
+    // ダイアログが開いたときにテキストフィールドを自動的に選択します
+    _focusNode.requestFocus();
+    _textController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _textController.text.length));
   }
 
   Future<void> _deleteAll() async {
@@ -137,7 +143,7 @@ class PersonalDetailState extends State<PersonalDetail> {
     await DBHelper().deletePersonalityById(widget.person['id']);
     await DBHelper().deletePersonById(widget.person['id']);
     //前の画面に戻る
-    if(mounted){
+    if (mounted) {
       Navigator.pop(context);
     }
   }
@@ -237,22 +243,22 @@ class PersonalDetailState extends State<PersonalDetail> {
             child: FutureBuilder(
               future: _createList(),
               builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                return ListView.builder(
-                  itemCount: personsDetail[selector.index].length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Column(
-                      children: [
-                        ListTile(
-                          title: Text(
-                        (personsDetail[selector.index][index].toString())),
-                          onTap: () => _deleteThings(index),
-                        ),
-                        const Divider(),
-                      ],
-                    );
-                  },
-                );
-              },
+                  return ListView.builder(
+                    itemCount: personsDetail[selector.index].length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Column(
+                        children: [
+                          ListTile(
+                            title: Text((personsDetail[selector.index][index]
+                                .toString())),
+                            onTap: () => _deleteThings(index),
+                          ),
+                          const Divider(),
+                        ],
+                      );
+                    },
+                  );
+                }
             ),
           )
         ],
@@ -268,7 +274,7 @@ class PersonalDetailState extends State<PersonalDetail> {
           ),
           const SizedBox(height: 50),
           FloatingActionButton(
-            onPressed: _add,
+            onPressed: _addAlert,
             tooltip: 'add',
             child: const Icon(Icons.add),
           ),

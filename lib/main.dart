@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
+      darkTheme: ThemeData.dark(),
       home: const MyHomePage(title: "あなたの人間関係"),
     );
   }
@@ -36,7 +37,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final _textController = TextEditingController();
+  late TextEditingController _textController;
+  late FocusNode _focusNode;
   var people = <Map<String, dynamic>>[];
   var ids = <String>[];
   var names = <String>[];
@@ -48,12 +50,15 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _addPerson() {
+    _textController = TextEditingController();
+    _focusNode = FocusNode();
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           content: TextField(
             controller: _textController,
+            focusNode: _focusNode,
             decoration: const InputDecoration(hintText: "名前"),
           ),
           actions: <Widget>[
@@ -82,7 +87,15 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         );
       },
-    );
+    ).then((_) {
+      // ダイアログが閉じられたときにリソースをクリーンアップします
+      _textController.dispose();
+      _focusNode.dispose();
+    });
+
+    // ダイアログが開いたときにテキストフィールドを自動的に選択します
+    _focusNode.requestFocus();
+    _textController.selection = TextSelection.fromPosition(TextPosition(offset: _textController.text.length));
   }
 
   //リストを作成する
