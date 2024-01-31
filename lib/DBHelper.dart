@@ -11,6 +11,7 @@ class DBHelper {
   static const _personTableName = 'person';
   static const _personColumnId = 'id';
   static const _personColumnName = 'name';
+  static const _personColumnFavorite = 'favorite';
 
   //約束ごとなどを載せるテーブル
   static const _willTableName = 'will';
@@ -90,7 +91,8 @@ class DBHelper {
     db.execute('''
       CREATE TABLE $_personTableName (
         $_personColumnId INTEGER PRIMARY KEY AUTOINCREMENT,
-        $_personColumnName TEXT NOT NULL
+        $_personColumnName TEXT NOT NULL,
+        $_personColumnFavorite INTEGER NOT NULL DEFAULT 0
       )
     ''');
     db.execute('''
@@ -163,7 +165,20 @@ class DBHelper {
   //personテーブルのデータを全件取得する
   Future<List<Map<String, dynamic>>> getAllPerson() async {
     final db = await database;
-    return db.query(_personTableName);
+    return db.query(_personTableName, orderBy: "${_personColumnFavorite} DESC, id ASC");
+  }
+
+  //personテーブルのお気に入りを更新する
+  Future<void> updateFavorite(int id, int favorite) async {
+    final db = await database;
+    await db.update(
+      _personTableName,
+      {
+        _personColumnFavorite: favorite,
+      },
+      where: '$_personColumnId = ?',
+      whereArgs: [id],
+    );
   }
 
   /// willテーブルの操作

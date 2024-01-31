@@ -23,7 +23,7 @@ class PersonalDetailState extends State<PersonalDetail> {
   var personSerial = <List<String>>[];
   var promptHead = "あなたは下記の特徴をもつ人物になりきって今後の返答を行ってください。\n";
   var promptDisplay = "";
-  List<String> tabName = ["約束", "外見", "内面", "思い出"]; //タブ名称
+  List<String> tabName = ["これから", "外見", "内面", "今まで"]; //タブ名称
 
   Future<void> _createList() async {
     //DBからpersonに紐づく全てのデータを取得する
@@ -196,7 +196,6 @@ class PersonalDetailState extends State<PersonalDetail> {
                 }
                 //リストを再作成する
                 _createList();
-
                 Navigator.of(context).pop(); // ダイアログを閉じる
               },
             ),
@@ -228,7 +227,6 @@ class PersonalDetailState extends State<PersonalDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text('${widget.person['name']}の${tabName[selector.index]}'),
         actions: [
           IconButton(
@@ -246,15 +244,16 @@ class PersonalDetailState extends State<PersonalDetail> {
                   return ListView.builder(
                     itemCount: personsDetail[selector.index].length,
                     itemBuilder: (BuildContext context, int index) {
-                      return Column(
-                        children: [
-                          ListTile(
-                            title: Text((personsDetail[selector.index][index]
-                                .toString())),
-                            onTap: () => _deleteThings(index),
-                          ),
-                          const Divider(),
-                        ],
+                      return Card(
+                        child: Column(
+                          children: [
+                            ListTile(
+                              title: Text((personsDetail[selector.index][index]
+                                  .toString())),
+                              onTap: () => _deleteThings(index),
+                            ),
+                          ],
+                        ),
                       );
                     },
                   );
@@ -281,10 +280,7 @@ class PersonalDetailState extends State<PersonalDetail> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.black.withOpacity(.60),
         currentIndex: selector.index,
         onTap: (value) {
           setState(() {
@@ -307,10 +303,10 @@ class PersonalDetailState extends State<PersonalDetail> {
           });
         },
         items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.update), label: "約束"),
+          BottomNavigationBarItem(icon: Icon(Icons.update), label: "これから"),
           BottomNavigationBarItem(icon: Icon(Icons.mood), label: "外見"),
           BottomNavigationBarItem(icon: Icon(Icons.favorite), label: "内面"),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: "思い出")
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: "今まで")
         ],
       ),
     );
